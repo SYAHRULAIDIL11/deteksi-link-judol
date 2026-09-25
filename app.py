@@ -1,15 +1,32 @@
 from flask import Flask, render_template, request
 import joblib
 import pandas as pd
+import os
 
 from feature_extraction import extract_features
 
 
 app = Flask(__name__)
 
-# Load model Random Forest
-model = joblib.load("model/random_forest.pkl")
 
+# ==============================
+# LOAD MODEL RANDOM FOREST
+# ==============================
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+MODEL_PATH = os.path.join(
+    BASE_DIR,
+    "model",
+    "random_forest.pkl"
+)
+
+model = joblib.load(MODEL_PATH)
+
+
+# ==============================
+# ROUTE UTAMA
+# ==============================
 
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -38,9 +55,11 @@ def home():
 
             # Ambil probabilitas dari kelas yang diprediksi
             confidence = round(
-                probabilities[prediction] * 100, 2
+                probabilities[prediction] * 100,
+                2
             )
 
+            # Hasil prediksi
             if prediction == 1:
                 result = "TERINDIKASI JUDI ONLINE"
             else:
@@ -53,6 +72,10 @@ def home():
         url=url_input
     )
 
+
+# ==============================
+# RUN APPLICATION
+# ==============================
 
 if __name__ == "__main__":
     app.run(debug=True)
